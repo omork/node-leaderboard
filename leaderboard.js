@@ -1,4 +1,5 @@
 var redis = require("./redis-client.js");
+var sys = require("sys");
 
 function get(hash, key, default_value) { 
   if (key in hash) { return key }
@@ -20,23 +21,127 @@ function Leaderboard(leaderboard_name, options) {
   rport = get(options, 'port', DEFAULT_REDIS_PORT)
   rdb   = get(options, 'db',   DEFAULT_REDIS_DB)
 
-  var rcl = redis.createClient(rhost, rport, {'db':rdb});
+  var rcl = redis.createClient(rport, rhost);
 
   return {
     leaderboard_name : leaderboard_name, 
     options : JSON.parse(JSON.stringify(options)),
+    use_zero_index_for_rank: get(options, 'use_zero_index_for_rank', false),
     page_size : page_size,
     redis_connection : rcl,
-    total_members : function(leaderboard, callback) { return this.redis_connection.zcard(leaderboard_name, function (result) { 
-      if (!undefined == callback) { callback(result) }
-    })},
-    rank_member : function(member, score, callback) { this.redis_connection.zadd(leaderboard_name, score, member, function(result) { 
-      if (!undefined == callback) { callback(result) }
-    }) }
+    onConnect : function(callback) {
+      this.redis_connection.stream.addListener("connect", callback)    
+    },
+
+    rank_member : function(member, score, callback) { this.redis_connection.zadd(this.leaderboard_name, member, score, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    remove_member : function(member, callback) { this.redis_connection.zrem(this.leaderboard_name, member, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    clear : function(callback) { this.redis_connection.delete(this.leaderboard_name, member, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    total_members : function(member, callback) { this.redis_connection.zcard(this.leaderboard_name, member, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    total_pages : function(callback) { this.total_members(function (err, reply) {
+      if ("function" == typeof callback) { 
+        callback(err, Math.ceil(parseFloat(reply) / this.page_size));
+      }
+    }) },
+
+    total_members_in_score_range : function(min_score, max_score, callback) { this.redis_connection.zcount(this.leaderboard_name, min_score, max_score, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    change_score_for : function(member, delta, callback) { this.redis_connection.zincr(this.leaderboard_name, member, delta, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    rank_for : function(member, callback) { this.redis_connection.zrevrank(this.leaderboard_name, member, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, (reply + (this.use_zero_index_for_rank ? 0 : 1))); }
+    }) },
+
+    score_for : function(member, callback) { this.redis_connection.zscore(this.leaderboard_name, member, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    check_member : function(member, callback) { this.redis_connection.zscore(this.leaderboard_name, member, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, (!(null == reply))); }
+    }) },
+
+    score_and_rank_for : function(member, callback) {
+      this.score_for(member, function(err, score) {
+        this.rank_for(member, function(err, rank) {
+          if ("function" == typeof callback) { callback(err, score, rank); }
+        })
+      })
+    },
+
+    remove_members_in_score_range : function(min_score, max_score, callback) { this.redis_connection.zremrangebyscore(this.leaderboard_name, min_score, max_score, function(err, reply) {
+      if ("function" == typeof callback) { callback(err, reply); }
+    }) },
+
+    leaders : function(current_page, with_scores, with_rank, callback) { 
+      if (current_page < 1) { current_page = 1; }
+      this.total_pages(function(err, pages) {
+        redis_index = current_page - 1;
+        starting_index = redis_index * this.page_size;
+        ending_offset = (starting_offset + page_size) - 1
+        raw_leader_data = this.redis_connection.zrevrange(this.leaderboard_name, starting_offset, ending_offset, with_score, function(err, reply) {
+          this._massage_leader_data(reply, with_rank, callback); })
+      })
+    },
+
+    around_me : function(member, with_scores, with_rank, callback) { 
+      this.redis_connection.zrevrank(this.leaderboard_name, member, function(err, reverse_rank_for_member) {
+        starting_offset = Math.floor(reverse_rank_for_member - (this.page_size / 2));
+        ending_offset = (starting_offset + this.page_size) - 1
+        this.redis_connection.zrevrange(this.leaderboard_name, starting_offset, ending_offset, with_scores, function(err, reply) {
+          this._massage_leader_data(reply, with_rank, callback);
+        })
+      })
+    },
+
+    ranked_in_list : function(members, with_scores, callback) {
+      leader_data = []
+      members.forEach(function(member) {
+        self.rank_for(member, function(err, rank) {
+          self.score_for(member, function(err, score) {
+            leader_data.unshift({'member' : member, 'score' : score, 'rank': rank})
+          })
+        })
+      })
+      if ("function" == typeof callback) { callback(false, leader_data); }
+    },
+
+    _massage_leader_data: function(leaders, with_rank, callback) {
+      member_attribute = true;
+      leader_data = [];
+      leaders.forEach(function (leader) {
+        data = {};
+        data['member'] = leader_data_item[0]
+        data['score'] = leader_data_item[1]
+        if (with_rank) { 
+          this.rank_for(data['member'], function (err, reply) {
+            data['rank'] = reply
+          })
+        }
+        leader_data.unshift(data);
+      })
+
+      callback(false, leader_data);
+    }
   }
 }
 
 leaderboard = Leaderboard('asd')
-
-leaderboard.rank_member('asdf', 1)
-console.log(leaderboard.total_members())
+leaderboard.onConnect(function () {
+  leaderboard.check_member('asdf', function(err, reply) { sys.puts(reply)}) 
+  leaderboard.check_member('asdfsdf', function(err, reply) { sys.puts(reply)})
+});
