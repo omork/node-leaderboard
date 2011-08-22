@@ -7,6 +7,14 @@ Builds off ideas proposed in http://blog.agoragames.com/2011/01/01/creating-high
 
 see https://github.com/agoragames/leaderboard/ for detailed usage information
 
+see http://nodejs.org/ for more information about node.js.
+
+
+Example
+=======
+
+see examples.js
+
 .. _license:
 
 License
