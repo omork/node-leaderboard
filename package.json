@@ -1,0 +1,6 @@
+{ "name": "node-leaderboard",
+  "description": "A node-specific implementation of Agora Game's leaderboard package",
+  "version": "0.0.1",
+  "author": "Ola Mork",
+  "main": "leaderboard"
+}
