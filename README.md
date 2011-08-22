@@ -1,5 +1,5 @@
-Overview
-========
+# Overview
+
 
 Leaderboards backed by Redis for node.js, http://redis.io.
 
@@ -10,11 +10,12 @@ see https://github.com/agoragames/leaderboard/ for detailed usage information
 see http://nodejs.org/ for more information about node.js.
 
 
-Example
-=======
+* Example
+
 
 see examples.js for more.::
 
+<pre>
   var lbm = require("./leaderboard.js");
   var sys = require('sys');
   
@@ -25,12 +26,9 @@ see examples.js for more.::
   leaderboard.onConnect(function () {
     leaderboard.total_members(function(err, reply) { sys.puts("total members: " + reply) })
   }
+</pre>
 
-
-.. _license:
-
-License
-=======
+* License
 
 This software is licensed under the `New BSD License`. See the ``LICENSE``
 file in the top distribution directory for the full license text.
