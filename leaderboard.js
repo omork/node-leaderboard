@@ -1,5 +1,4 @@
 var redis = require("./redis-client.js");
-var sys = require("sys");
 
 function get(hash, key, default_value) { 
   if (key in hash) { return key }
@@ -33,7 +32,7 @@ function Leaderboard(leaderboard_name, options) {
       this.redis_connection.stream.addListener("connect", callback)    
     },
 
-    rank_member : function(member, score, callback) { this.redis_connection.zadd(this.leaderboard_name, member, score, function(err, reply) {
+    rank_member : function(member, score, callback) { this.redis_connection.zadd(this.leaderboard_name, score, member, function(err, reply) {
       if ("function" == typeof callback) { callback(err, reply); }
     }) },
 
@@ -45,7 +44,7 @@ function Leaderboard(leaderboard_name, options) {
       if ("function" == typeof callback) { callback(err, reply); }
     }) },
 
-    total_members : function(member, callback) { this.redis_connection.zcard(this.leaderboard_name, member, function(err, reply) {
+    total_members : function(callback) { this.redis_connection.zcard(this.leaderboard_name, function(err, reply) {
       if ("function" == typeof callback) { callback(err, reply); }
     }) },
 
@@ -76,8 +75,9 @@ function Leaderboard(leaderboard_name, options) {
     }) },
 
     score_and_rank_for : function(member, callback) {
+      innerthis = this;
       this.score_for(member, function(err, score) {
-        this.rank_for(member, function(err, rank) {
+        innerthis.rank_for(member, function(err, rank) {
           if ("function" == typeof callback) { callback(err, score, rank); }
         })
       })
@@ -92,18 +92,20 @@ function Leaderboard(leaderboard_name, options) {
       this.total_pages(function(err, pages) {
         redis_index = current_page - 1;
         starting_index = redis_index * this.page_size;
-        ending_offset = (starting_offset + page_size) - 1
+        ending_offset = (starting_offset + page_size) - 1;
+        innerthis = this;
         raw_leader_data = this.redis_connection.zrevrange(this.leaderboard_name, starting_offset, ending_offset, with_score, function(err, reply) {
-          this._massage_leader_data(reply, with_rank, callback); })
+          innerthis._massage_leader_data(reply, with_rank, callback); })
       })
     },
 
     around_me : function(member, with_scores, with_rank, callback) { 
       this.redis_connection.zrevrank(this.leaderboard_name, member, function(err, reverse_rank_for_member) {
         starting_offset = Math.floor(reverse_rank_for_member - (this.page_size / 2));
-        ending_offset = (starting_offset + this.page_size) - 1
+        ending_offset = (starting_offset + this.page_size) - 1;
+        innerthis = this;
         this.redis_connection.zrevrange(this.leaderboard_name, starting_offset, ending_offset, with_scores, function(err, reply) {
-          this._massage_leader_data(reply, with_rank, callback);
+          innerthis._massage_leader_data(reply, with_rank, callback);
         })
       })
     },
@@ -111,8 +113,9 @@ function Leaderboard(leaderboard_name, options) {
     ranked_in_list : function(members, with_scores, callback) {
       leader_data = []
       members.forEach(function(member) {
-        self.rank_for(member, function(err, rank) {
-          self.score_for(member, function(err, score) {
+        this.rank_for(member, function(err, rank) {
+          innerthis = this;
+          innerthis.score_for(member, function(err, score) {
             leader_data.unshift({'member' : member, 'score' : score, 'rank': rank})
           })
         })
@@ -140,8 +143,4 @@ function Leaderboard(leaderboard_name, options) {
   }
 }
 
-leaderboard = Leaderboard('asd')
-leaderboard.onConnect(function () {
-  leaderboard.check_member('asdf', function(err, reply) { sys.puts(reply)}) 
-  leaderboard.check_member('asdfsdf', function(err, reply) { sys.puts(reply)})
-});
+exports.Leaderboard = Leaderboard
