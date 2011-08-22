@@ -28,8 +28,12 @@ see examples.js for more.
   }
 </pre>
 
+# Dependencies
+
+https://github.com/fictorial/redis-node-client (included)
+https://github.com/joyent/node
+
 # License
 
 This software is licensed under the `New BSD License`. See the ``LICENSE``
 file in the top distribution directory for the full license text.
-
