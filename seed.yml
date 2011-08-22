@@ -1,0 +1,6 @@
+---
+  name: node-leaderboard
+  description: A node-specific implementation of Agora Game's leaderboard package
+  tags: leaderboard
+  version: 0.0.1
+
