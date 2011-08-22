@@ -10,7 +10,7 @@ see https://github.com/agoragames/leaderboard/ for detailed usage information
 see http://nodejs.org/ for more information about node.js.
 
 
-* Example
+# Example
 
 
 see examples.js for more.::
@@ -28,7 +28,7 @@ see examples.js for more.::
   }
 </pre>
 
-* License
+# License
 
 This software is licensed under the `New BSD License`. See the ``LICENSE``
 file in the top distribution directory for the full license text.
