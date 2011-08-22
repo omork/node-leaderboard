@@ -13,7 +13,7 @@ see http://nodejs.org/ for more information about node.js.
 # Example
 
 
-see examples.js for more.::
+see examples.js for more.
 
 <pre>
   var lbm = require("./leaderboard.js");
