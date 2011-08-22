@@ -23,7 +23,8 @@ see examples.js for more.::
   
   // don't do anything until we've successfully connected
   leaderboard.onConnect(function () {
-  leaderboard.total_members(function(err, reply) { sys.puts("total members: " + reply) })
+    leaderboard.total_members(function(err, reply) { sys.puts("total members: " + reply) })
+  }
 
 
 .. _license:
