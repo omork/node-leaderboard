@@ -1,4 +1,4 @@
-var redis = require("./redis-client.js");
+var redis = require("redis");
 
 function get(hash, key, default_value) { 
   if (key in hash) { return key }

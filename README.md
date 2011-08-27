@@ -30,7 +30,7 @@ see examples.js for more.
 
 # Dependencies
 
-https://github.com/fictorial/redis-node-client (included)
+https://github.com/mranney/node_redis (included)
 https://github.com/joyent/node
 
 # License
