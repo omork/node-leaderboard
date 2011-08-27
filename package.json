@@ -1,6 +1,21 @@
-{ "name": "node-leaderboard",
-  "description": "A node-specific implementation of Agora Game's leaderboard package",
-  "version": "0.0.1",
-  "author": "Ola Mork",
-  "main": "leaderboard"
+{ "name" : "node-leaderboard",
+  "description" : "A node-specific implementation of Agora Games leaderboard package",
+  "keywords" : [ "node", "leaderboard", "redis" ],
+  "version" : "0.0.1",
+  "author" : "Ola Mork",
+  "homepage" : "https://github.com/omork/node-leaderboard",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/omork/node-leaderboard.git"
+  },
+  "licenses" : [
+    {
+      "type" : "MIT",
+      "url" : "https://github.com/omork/node-leaderboard/blob/master/LICENSE"
+    }
+  ],
+  "scripts": {
+    "test": "node ./test.js"
+  },
+  "main" : "leaderboard.js"
 }
