@@ -5,17 +5,17 @@ Leaderboards backed by Redis for node.js, http://redis.io.
 
 Builds off ideas proposed in http://blog.agoragames.com/2011/01/01/creating-high-score-tables-leaderboards-using-redis/.
 
-see https://github.com/agoragames/leaderboard/ for detailed usage information
+See https://github.com/agoragames/leaderboard/ for detailed usage information
 
-see http://nodejs.org/ for more information about node.js.
+See http://nodejs.org/ for more information about node.js.
 
 
 # Example
 
 
-see examples.js for more.
+See examples.js for more.
 
-<pre>
+```javascript
   var lbm = require("./leaderboard.js");
   var sys = require('sys');
   
@@ -26,12 +26,12 @@ see examples.js for more.
   leaderboard.onConnect(function () {
     leaderboard.total_members(function(err, reply) { sys.puts("total members: " + reply) })
   }
-</pre>
+```
 
 # Dependencies
 
-https://github.com/mranney/node_redis (included)
-https://github.com/joyent/node
+  * https://github.com/mranney/node_redis (included)
+  * https://github.com/joyent/node
 
 # License
 
