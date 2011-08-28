@@ -23,7 +23,7 @@ See examples.js for more.
   leaderboard = lbm.Leaderboard('wins');
   
   // don't do anything until we've successfully connected
-  leaderboard.onConnect(function () {
+  leaderboard.on_connect(function () {
     leaderboard.total_members(function(err, reply) { sys.puts("total members: " + reply) })
   }
 ```
