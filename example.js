@@ -5,10 +5,10 @@ var sys = require('sys');
 leaderboard = lbm.Leaderboard('wins');
 
 // don't do anything until we've successfully connected
-leaderboard.onConnect(function () {
+leaderboard.on_connect(function () {
   leaderboard.total_members(function(err, reply) { sys.puts("total members: " + reply) })
 // set a score (it's over 900!)
-  leaderboard.rank_member('olamork', 9001)
+  leaderboard.rank_member('olamork', 9001, function(err, reply) { sys.puts("rank_member : " + reply ) })
 // check that we're actually in there
   leaderboard.check_member('olamork', function(err, reply) { sys.puts(reply)})
 
@@ -16,5 +16,8 @@ leaderboard.onConnect(function () {
 // but erling isn't.
   leaderboard.check_member('erling', function(err, reply) { sys.puts(reply)})
 // there should be at least one now:
-  leaderboard.total_members(function(err, reply) { sys.puts("total members: " + reply) })
+  leaderboard.total_members(function(err, reply) { 
+    sys.puts("total members: " + reply);
+    process.exit(0);
+  })
 });

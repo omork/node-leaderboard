@@ -28,7 +28,7 @@ function Leaderboard(leaderboard_name, options) {
     use_zero_index_for_rank: get(options, 'use_zero_index_for_rank', false),
     page_size : page_size,
     redis_connection : rcl,
-    onConnect : function(callback) {
+    on_connect : function(callback) {
       this.redis_connection.stream.addListener("connect", callback)    
     },
 
