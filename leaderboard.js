@@ -1,4 +1,4 @@
-var redis = require("./redis-client.js");
+var redis = require("redis");
 
 function get(hash, key, default_value) { 
   if (key in hash) { return key }
@@ -7,7 +7,7 @@ function get(hash, key, default_value) {
 
 function Leaderboard(leaderboard_name, options) {
   if (undefined == options) { options = {} }
-  VERSION = '1.1.4'
+  VERSION = '0.0.1'
   DEFAULT_PAGE_SIZE = 25
   DEFAULT_REDIS_HOST = 'localhost'
   DEFAULT_REDIS_PORT = 6379
